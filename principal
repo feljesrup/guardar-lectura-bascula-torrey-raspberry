@@ -1,0 +1,28 @@
+import serial
+import RPi.GPIO as GPIO
+import time
+
+ser=serial.Serial("/dev/ttyACM0",9600)  #cambie el numero del
+#dispositivo ACM de acuerdo a la tabla dada por el comando
+#ls /dev/tty*
+ser.baudrate=9600
+def blink(pin):
+
+
+    GPIO.output(pin,GPIO.HIGH)  
+    time.sleep(1)  
+    GPIO.output(pin,GPIO.LOW)  
+    time.sleep(1)  
+    return
+
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(11, GPIO.OUT)
+while True:
+    # ser.write(b'P')
+    read_ser=ser.read()
+    read_ser_d=read_ser.decode()
+    print(read_ser)
+   # f = open ('/home/pi/Desktop/registro.txt','a')
+    f = open ('/media/pi/W7_TODO_EN_/registro.txt','a')
+    f.write(read_ser_d)
+    f.close()
