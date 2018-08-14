@@ -1,0 +1,171 @@
+COMANDOS:
+Veamos a continación algunos comandos básicos para manejar la Raspberry en modo texto, a través de la terminal.
+
+Cerrar sesión SSH:
+
+exit
+Para apagar el sistema podemos usar cualquiera de estos dos métodos:
+
+sudo poweroff 
+sudo shutdown -h now
+Podemos reiniciar el sistema utilizando uno de estos dos comandos:
+
+sudo reboot 
+sudo shutdown -r
+Actualizar el sistema operativo:
+
+sudo apt-get update 
+sudo apt-get upgrade
+Actualizar el kérnel:
+
+sudo rpi-update
+Crear un directorio o carpeta:
+
+mkdir carpeta
+Borrar un directorio o carpeta:
+
+rmdir carpeta
+Borrar un directorio o carpeta no vacíos:
+
+rm –rf carpeta
+Desplazarse a un directorio:
+
+cd /carpeta
+Saber en qué directorio estamos:
+
+pwd
+Mostrar el contenido de una carpeta:
+
+ls
+Mostrar el contenido de una carpeta con información extendida:
+
+ls -l
+Contar todos los elementos que contiene una carpeta o directorio:
+
+ls | wc -l
+Contar sólo los ficheros que contiene una carpeta o directorio:
+
+find . -maxdepth 1 -type f | wc -l
+Ir al directorio anterior:
+
+cd ..
+Ir al directorio home:
+
+cd
+Ir al directorio raíz:
+
+cd /
+Crear o editar un fichero:
+
+nano fichero
+Borrar un fichero:
+
+rm fichero
+Borrar ficheros recursivamente (por su extensión):
+
+find . -name "*.jpg" -type f -delete
+Copiar un fichero en una carpeta:
+
+cp fichero /carpeta
+Mover un fichero a una carpeta:
+
+mv fichero /carpeta
+Renombrar un fichero:
+
+mv cancion.mp3 musica.mp3
+Cambiar los permisos de un fichero o carpeta:
+
+sudo chmod 755 fichero | carpeta                         [755 = rwxr-xr-x]
+Cambiar el dueño de un fichero o carpeta:
+
+sudo chown pi fichero | carpeta
+Cambiar el grupo de un fichero o carpeta:
+
+sudo chgrp grupo fichero | carpeta
+Cambiar los permisos, dueño o grupo de todas las carpetas y ficheros recursivamente:
+
+sudo chmod -R 755 * 
+sudo chown -R pi * 
+sudo chgrp -R grupo *
+Ver particiones y dispositivos conectados al sistema:
+
+sudo fdisk -l
+Montar una partición o dispositivo en una carpeta:
+
+sudo mount /dev/sdb1 /media/hdd         [crear previamente la carpeta /media/hdd]
+Desmontar una partición o dispositivo:
+
+sudo umount /dev/sdb1
+Forzar el desmontaje de una partición o dispositivo:
+
+sudo umount -l /dev/sdb1
+Volcar la salida de un comando en un fichero (usando >):
+
+ls -l > fichero
+Histórico de comandos utilizados:
+
+history
+Mostrar información del sistema:
+
+htop                     [instalar antes con sudo apt-get install htop]
+Saber qué usuarios están conectados al sistema:
+
+who
+Mostrar calendario del mes actual:
+
+ncal -MC
+Mostrar calendario del año indicado:
+
+ncal 2018 -MC
+Ver el espacio libre/ocupado en las unidades de almacenamiento:
+
+df -h
+Saber el espacio ocupado por los ficheros de un directorio:
+
+du -h /home/pi
+Conocer la cantidad de memoria RAM y swap utilizadas:
+
+free
+Mostrar la versión del kérnel:
+
+uname -r
+Saber la versión del firmware:
+
+/opt/vc/bin/vcgencmd version
+Obtener información de la CPU:
+
+cat /proc/cpuinfo
+Comprobar la temperatura del procesador:
+
+vcgencmd measure_temp
+Saber si un paquete está instalado:
+
+aptitude show paquete
+Instalar un paquete desde el repositorio:
+
+sudo apt-get install paquete
+Desinstalarlo:
+
+sudo apt-get remove paquete 
+sudo apt-get purge paquete
+Instalar un paquete.deb:
+
+sudo dpkg -i paquete.deb
+Desinstalarlo:
+
+sudo dpkg -r paquete.deb 
+sudo dpkg -P paquete.deb
+Instalar un programa desde los ficheros fuente:
+
+./configure 
+make 
+sudo make install 
+Limpiar instalaciones fallidas:
+
+sudo apt-get clean
+Eliminar paquetes inservibles:
+
+sudo apt-get autoremove
+Solucionar errores de instalaciones fallidas:
+
+sudo dpkg --configure -a
