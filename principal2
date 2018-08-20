@@ -1,0 +1,55 @@
+import serial
+import RPi.GPIO as GPIO
+import time
+import os
+#n=0;
+#time.sleep(16)
+while True:
+    try:
+        ser=serial.Serial("/dev/ttyACM0",9600,timeout=1)  #cambie el numero del
+        #dispositivo ACM de acuerdo a la tabla dada por el comando
+        #ls /dev/tty*
+        ser.baudrate=9600
+        print ("dispositivo conectado")
+        break
+    except :
+        print ("no hay dispositivo conectado")
+#time.sleep(5)
+def blink(pin):
+    GPIO.output(pin,GPIO.HIGH)  
+    time.sleep(1)  
+    GPIO.output(pin,GPIO.LOW)  
+    time.sleep(1)  
+    return
+print("config gpio")
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(11, GPIO.OUT)
+GPIO.setup(7, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.output(11,GPIO.LOW)
+time.sleep(1) 
+while True:
+    try :
+        # ser.write(b'P')
+        read_ser=ser.read()
+        read_ser_d=read_ser.decode()
+        print(read_ser)
+        f = open ('/media/pi/BASCULA/registro.txt','a')
+        #f.write(str(n))
+        f.write(read_ser_d)
+        f.close()
+        blink(11)
+        #GPIO.output(11,GPIO.HIGH)
+        if GPIO.input(7):
+            f = open ('/media/pi/BASCULA/registro.txt','a')
+            f.write("-----Nuevo registro-------------"+'\n')
+            f.close()
+            blink(11)
+            #GPIO.output(11,GPIO.LOW)
+            #time.sleep(3)
+    except :
+        print("no hay memoria usb conectada")
+        GPIO.output(11,GPIO.LOW)
+
+   
+  
+####
