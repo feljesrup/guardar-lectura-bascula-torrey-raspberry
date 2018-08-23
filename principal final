@@ -1,0 +1,88 @@
+import serial
+import RPi.GPIO as GPIO
+import time
+import os
+#esperamos 9 segundos en reinicio del s.o. para que se reconozcan los dispos USB
+time.sleep(9)
+
+def blink(pin):
+    GPIO.output(pin,GPIO.HIGH)  
+    time.sleep(0.001)  
+    GPIO.output(pin,GPIO.LOW)  
+    time.sleep(0.001)  
+    return
+
+print("config gpio")
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(11, GPIO.OUT)
+GPIO.setup(7, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.output(11,GPIO.LOW)
+f = open ('/home/pi/Desktop/registro.txt','a')
+f.write("iniciando"+'\n')
+f.close()
+#buscamos la bascula conectada; si no esta, esperamos su conexion
+
+while True:
+    try:
+        ser=serial.Serial("/dev/ttyACM0",9600,timeout=1)  #cambie el numero del
+        #dispositivo ACM de acuerdo a la tabla dada por el comando
+        #ls /dev/tty*
+        ser.baudrate=9600
+        print ("dispositivo conectado")
+        break
+    except :
+        GPIO.output(11,GPIO.HIGH)
+        print ("no hay dispositivo conectado")
+
+GPIO.output(11,GPIO.LOW)
+time.sleep(1)
+#buscamos el archivo registro.txt en modo solo lectura para verificar si existe
+#o si esta conectada la memoria USB
+#en caso de que no, se activa alarma audible y se espera la conexion
+#de la memoria con el archivo
+while True:
+    try :
+        print('buscando archivo')
+        f = open ('/media/pi/BASCULA/registro.txt','r')
+        f.close()
+        print('se encontro archivo')
+        time.sleep(1)
+        f = open ('/media/pi/BASCULA/registro.txt','a')
+        f.write("----------reinicio-------------"+'\n')
+        f.close()
+        blink(11)
+        blink(11)
+        blink(11)
+        print('guardando archivo')
+        os.system('ls /media/pi > /home/pi/Desktop/dispositivos.txt')
+        break
+    except :
+        GPIO.output(11,GPIO.HIGH)
+        os.system('sudo rm -rf /media/pi/BASCULA')
+        print('reinicie e inserte una memoria')
+        time.sleep(1)
+
+#se espera a recibir datos en el puerto serie y se guarda en la memoria;
+#en caso de desconexion se activa alarma audible y se espera la reconexion.
+while True:
+    try :
+        # ser.write(b'P')
+        read_ser=ser.read()
+        read_ser_d=read_ser.decode()
+        if read_ser!=b'':
+            print(read_ser)
+            f = open ('/media/pi/BASCULA/registro.txt','a')
+            f.write(read_ser_d)
+            f.close()
+            blink(11)
+        if GPIO.input(7):
+            f = open ('/media/pi/BASCULA/registro.txt','a')
+            f.write("-----Nuevo registro-------------"+'\n')
+            f.close()
+            GPIO.output(11,GPIO.HIGH)
+            time.sleep(2)
+            GPIO.output(11,GPIO.LOW)
+            time.sleep(2)
+    except :
+        print("no hay memoria usb conectada")
+        GPIO.output(11,GPIO.HIGH)
