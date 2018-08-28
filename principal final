@@ -5,18 +5,26 @@ import os
 #esperamos 9 segundos en reinicio del s.o. para que se reconozcan los dispos USB
 time.sleep(9)
 
+def apagar():
+    if GPIO.input(15):
+        GPIO.output(13,GPIO.LOW)
+        os.system('sudo poweroff')
+    return
 def blink(pin):
-    GPIO.output(pin,GPIO.HIGH)  
-    time.sleep(0.001)  
     GPIO.output(pin,GPIO.LOW)  
-    time.sleep(0.001)  
+    time.sleep(0.01)  
+    GPIO.output(pin,GPIO.HIGH)  
+    time.sleep(0.01)  
     return
 
 print("config gpio")
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(11, GPIO.OUT)
+GPIO.setup(13, GPIO.OUT)
 GPIO.setup(7, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-GPIO.output(11,GPIO.LOW)
+GPIO.setup(15, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.output(11,GPIO.HIGH)
+GPIO.output(13,GPIO.HIGH)
 f = open ('/home/pi/Desktop/registro.txt','a')
 f.write("iniciando"+'\n')
 f.close()
@@ -24,6 +32,7 @@ f.close()
 
 while True:
     try:
+        apagar()
         ser=serial.Serial("/dev/ttyACM0",9600,timeout=1)  #cambie el numero del
         #dispositivo ACM de acuerdo a la tabla dada por el comando
         #ls /dev/tty*
@@ -31,10 +40,10 @@ while True:
         print ("dispositivo conectado")
         break
     except :
-        GPIO.output(11,GPIO.HIGH)
+        GPIO.output(11,GPIO.LOW)
         print ("no hay dispositivo conectado")
 
-GPIO.output(11,GPIO.LOW)
+GPIO.output(11,GPIO.HIGH)
 time.sleep(1)
 #buscamos el archivo registro.txt en modo solo lectura para verificar si existe
 #o si esta conectada la memoria USB
@@ -42,6 +51,7 @@ time.sleep(1)
 #de la memoria con el archivo
 while True:
     try :
+        apagar()
         print('buscando archivo')
         f = open ('/media/pi/BASCULA/registro.txt','r')
         f.close()
@@ -57,8 +67,8 @@ while True:
         os.system('ls /media/pi > /home/pi/Desktop/dispositivos.txt')
         break
     except :
-        GPIO.output(11,GPIO.HIGH)
-        os.system('sudo rm -rf /media/pi/BASCULA')
+        GPIO.output(11,GPIO.LOW)
+        #os.system('sudo rm -rf /media/pi/BASCULA')
         print('reinicie e inserte una memoria')
         time.sleep(1)
 
@@ -66,6 +76,7 @@ while True:
 #en caso de desconexion se activa alarma audible y se espera la reconexion.
 while True:
     try :
+        apagar()
         # ser.write(b'P')
         read_ser=ser.read()
         read_ser_d=read_ser.decode()
@@ -79,10 +90,10 @@ while True:
             f = open ('/media/pi/BASCULA/registro.txt','a')
             f.write("-----Nuevo registro-------------"+'\n')
             f.close()
-            GPIO.output(11,GPIO.HIGH)
-            time.sleep(2)
             GPIO.output(11,GPIO.LOW)
+            time.sleep(2)
+            GPIO.output(11,GPIO.HIGH)
             time.sleep(2)
     except :
         print("no hay memoria usb conectada")
-        GPIO.output(11,GPIO.HIGH)
+        GPIO.output(11,GPIO.LOW)
